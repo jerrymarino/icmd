@@ -1,7 +1,7 @@
 icmd: a code-completion & comprehension server
 ==============================================
 
-TODO:jerry Update this
+**TODO:jerry update build statuses**
 
 [![Build Status](https://travis-ci.org/Valloric/ycmd.svg?branch=master)](https://travis-ci.org/Valloric/ycmd)
 [![Build status](https://ci.appveyor.com/api/projects/status/6fetp5xwb0kkuv2w/branch/master?svg=true)](https://ci.appveyor.com/project/Valloric/ycmd)
@@ -39,8 +39,7 @@ When you first clone the repository you'll need to update the submodules:
 git submodule update --init --recursive
 ```
 
-Then run `./build.py --all` or any of the specific completers listed by
-`./build.py --help`. This should get you going.
+Then run `./build.py` 
 
 For more detailed instructions on building ycmd, see [YCM's
 instructions][ycm-install] (ignore the Vim-specific parts).
@@ -173,72 +172,8 @@ After it starts up, ycmd will _delete_ the settings file you provided after
 it reads it.
 
 The settings file is something your editor should produce based on values your
-user has configured. There's also an extra file (`.ycm_extra_conf.py`) your user
-is supposed to provide to configure certain semantic completers. More
-information on it can also be found in the [corresponding section of YCM's _User
-Guide_][extra-conf-doc].
-
-### `.ycm_extra_conf.py` specification
-
-The `.ycm_extra_conf.py` module must define the following methods:
-
-#### `FlagsForFile( filename, **kwargs )`
-
-Required for c-family language support.
-
-This method is called by the c-family completer to get the
-compiler flags to use when compiling the file with absolute path `filename`.
-The following additional arguments are optionally supplied depending on user
-configuration:
-
-- `client_data`: any additional data supplied by the client application.
-   See the [YouCompleteMe documentation][extra-conf-vim-data-doc] for an
-   example.
-
-The return value must be one of the following:
-
-- `None` meaning no flags are known for this file, or
-
-- a dictionary containing the following items:
-
-  - `flags`: (mandatory) a list of compiler flags.
-
-  - `do_cache`: (optional) a boolean indicating whether or not the result of
-    this call (i.e. the list of flags) should be cached for this file name.
-    Defaults to `True`. If unsure, the default is almost always correct.
-
-  - `flags_ready`: (optional) a boolean indicating that the flags should be
-    used. Defaults to `True`. If unsure, the default is almost always correct.
-
-A minimal example which simply returns a list of flags is:
-
-```python
-def FlagsForFile( filename, **kwargs ):
-  return {
-    'flags': [ '-x', 'c++' ]
-  }
-```
-
-### Global extra conf file specification
-
-The global extra module must expose the same functions as the
-`.ycm_extra_conf.py` module with the following additions:
-
-#### `YcmCorePreLoad()`
-
-Optional.
-
-This method, if defined, is called by the server prior to importing the c++
-python plugin. It is not usually required and its use is for advanced users
-only.
-
-#### `Shutdown()`
-
-Optional.
-
-Called prior to the server exiting cleanly. It is not usually required and its
-use is for advanced users only.
-
+user has configured.
+ 
 Backwards compatibility
 -----------------------
 
