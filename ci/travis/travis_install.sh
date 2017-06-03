@@ -60,26 +60,5 @@ test ${python_version} == ${YCMD_PYTHON_VERSION}
 pip install -U pip wheel setuptools
 pip install -r test_requirements.txt
 
-# Enable coverage for Python subprocesses. See:
-# http://coverage.readthedocs.org/en/coverage-4.0.3/subprocess.html
-echo -e "import coverage\ncoverage.process_startup()" > \
-  ${PYENV_ROOT}/versions/${PYENV_VERSION}/lib/python${YCMD_PYTHON_VERSION}/site-packages/sitecustomize.py
-
-############
-# rust setup
-############
-
-curl https://sh.rustup.rs -sSf | sh -s -- -y
-
-export PATH="${HOME}/.cargo/bin:${PATH}"
-rustup update
-rustc -Vv
-cargo -V
-
-###############
-# Node.js setup
-###############
-
-npm install -g typescript
 
 set +e
