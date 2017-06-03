@@ -49,46 +49,11 @@ def RunFlake8():
 
 
 COMPLETERS = {
-  'cfamily': {
-    'build': [ '--clang-completer' ],
-    'test': [ '--exclude-dir=ycmd/tests/clang' ],
-    'aliases': [ 'c', 'cpp', 'c++', 'objc', 'clang', ]
-  },
-  'cs': {
-    'build': [ '--omnisharp-completer' ],
-    'test': [ '--exclude-dir=ycmd/tests/cs' ],
-    'aliases': [ 'omnisharp', 'csharp', 'c#' ]
-  },
-  'javascript': {
-    'build': [ '--tern-completer' ],
-    'test': [ '--exclude-dir=ycmd/tests/javascript' ],
-    'aliases': [ 'js', 'tern' ]
-  },
-  'go': {
-    'build': [ '--gocode-completer' ],
-    'test': [ '--exclude-dir=ycmd/tests/go' ],
-    'aliases': [ 'gocode' ]
-  },
-  'rust': {
-    'build': [ '--racer-completer' ],
-    'test': [ '--exclude-dir=ycmd/tests/rust' ],
-    'aliases': [ 'racer', 'racerd', ]
-  },
-  'typescript': {
-    'build': [],
-    'test': [ '--exclude-dir=ycmd/tests/typescript' ],
-    'aliases': []
-  },
-  'python': {
-    'build': [],
-    'test': [ '--exclude-dir=ycmd/tests/python' ],
-    'aliases': [ 'jedi', 'jedihttp', ]
-  },
   'swift': {
     'build': [ '--swift-completer' ],
     'test': [ '--exclude-dir=ycmd/tests/swift' ],
     'aliases': [ 'swift' ]
-  },
+  }
 }
 
 

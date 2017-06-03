@@ -40,13 +40,7 @@ THIRD_PARTY_FOLDERS = (
   os.path.join( DIR_OF_THIRD_PARTY, 'argparse' ),
   os.path.join( DIR_OF_THIRD_PARTY, 'bottle' ),
   os.path.join( DIR_OF_THIRD_PARTY, 'frozendict' ),
-  os.path.join( DIR_OF_THIRD_PARTY, 'godef' ),
-  os.path.join( DIR_OF_THIRD_PARTY, 'gocode' ),
-  os.path.join( DIR_OF_THIRD_PARTY, 'JediHTTP' ),
-  os.path.join( DIR_OF_THIRD_PARTY, 'OmniSharpServer' ),
-  os.path.join( DIR_OF_THIRD_PARTY, 'racerd' ),
   os.path.join( DIR_OF_THIRD_PARTY, 'requests' ),
-  os.path.join( DIR_OF_THIRD_PARTY, 'tern_runtime' ),
   os.path.join( DIR_OF_THIRD_PARTY, 'waitress' ),
   os.path.join( DIR_OF_THIRD_PARTY, 'swiftyswiftvim' )
 )

@@ -30,14 +30,6 @@ if not ( ( PY_MAJOR == 2 and PY_MINOR >= 6 ) or
 DIR_OF_THIS_SCRIPT = p.dirname( p.abspath( __file__ ) )
 DIR_OF_THIRD_PARTY = p.join( DIR_OF_THIS_SCRIPT, 'third_party' )
 
-for folder in os.listdir( DIR_OF_THIRD_PARTY ):
-  abs_folder_path = p.join( DIR_OF_THIRD_PARTY, folder )
-  if p.isdir( abs_folder_path ) and not os.listdir( abs_folder_path ):
-    sys.exit(
-      'ERROR: some folders in {0} are empty; you probably forgot to run:\n'
-      '\tgit submodule update --init --recursive\n'.format( DIR_OF_THIRD_PARTY )
-    )
-
 sys.path.insert( 1, p.abspath( p.join( DIR_OF_THIRD_PARTY, 'argparse' ) ) )
 
 import argparse
@@ -242,32 +234,9 @@ def GetGenerator( args ):
 
 def ParseArguments():
   parser = argparse.ArgumentParser()
-  parser.add_argument( '--clang-completer', action = 'store_true',
-                       help = 'Build C-family semantic completion engine.' )
-  parser.add_argument( '--system-libclang', action = 'store_true',
-                       help = 'Use system libclang instead of downloading one '
-                       'from llvm.org. NOT RECOMMENDED OR SUPPORTED!' )
-  parser.add_argument( '--omnisharp-completer', action = 'store_true',
-                       help = 'Build C# semantic completion engine.' )
-  parser.add_argument( '--swift-completer', action = 'store_true',
-                       help = 'Build Swift semantic completion engine.' )
-  parser.add_argument( '--gocode-completer', action = 'store_true',
-                       help = 'Build Go semantic completion engine.' )
-  parser.add_argument( '--racer-completer', action = 'store_true',
-                       help = 'Build rust semantic completion engine.' )
-  parser.add_argument( '--system-boost', action = 'store_true',
-                       help = 'Use the system boost instead of bundled one. '
-                       'NOT RECOMMENDED OR SUPPORTED!')
-  parser.add_argument( '--msvc', type = int, choices = [ 12, 14, 15 ],
-                       default = 15, help = 'Choose the Microsoft Visual '
-                       'Studio version (default: %(default)s).' )
-  parser.add_argument( '--tern-completer',
-                       action = 'store_true',
-                       help   = 'Enable tern javascript completer' ),
-  parser.add_argument( '--all',
-                       action = 'store_true',
-                       help   = 'Enable all supported completers',
-                       dest   = 'all_completers' )
+  parser.add_argument( '--swift-completer',
+                       action = 'store_true' )
+
   parser.add_argument( '--enable-coverage',
                        action = 'store_true',
                        help   = 'For developers: Enable gcov coverage for the '
@@ -288,24 +257,11 @@ def ParseArguments():
     # We always want a debug build when running with coverage enabled
     args.enable_debug = True
 
-  if ( args.system_libclang and
-       not args.clang_completer and
-       not args.all_completers ):
-    sys.exit( 'ERROR: you can\'t pass --system-libclang without also passing '
-              '--clang-completer or --all as well.' )
   return args
 
 
 def GetCmakeArgs( parsed_args ):
   cmake_args = []
-  if parsed_args.clang_completer or parsed_args.all_completers:
-    cmake_args.append( '-DUSE_CLANG_COMPLETER=ON' )
-
-  if parsed_args.system_libclang:
-    cmake_args.append( '-DUSE_SYSTEM_LIBCLANG=ON' )
-
-  if parsed_args.system_boost:
-    cmake_args.append( '-DUSE_SYSTEM_BOOST=ON' )
 
   if parsed_args.enable_debug:
     cmake_args.append( '-DCMAKE_BUILD_TYPE=Debug' )
@@ -415,74 +371,9 @@ def BuildYcmdLib( args ):
       rmtree( build_dir, ignore_errors = OnTravisOrAppVeyor() )
 
 
-def BuildOmniSharp():
-  build_command = PathToFirstExistingExecutable(
-    [ 'msbuild', 'msbuild.exe', 'xbuild' ] )
-  if not build_command:
-    sys.exit( 'ERROR: msbuild or xbuild is required to build Omnisharp.' )
-
-  os.chdir( p.join( DIR_OF_THIS_SCRIPT, 'third_party', 'OmniSharpServer' ) )
-  CheckCall( [ build_command, '/property:Configuration=Release' ] )
-
-
-def BuildGoCode():
-  if not FindExecutable( 'go' ):
-    sys.exit( 'ERROR: go is required to build gocode.' )
-
-  os.chdir( p.join( DIR_OF_THIS_SCRIPT, 'third_party', 'gocode' ) )
-  CheckCall( [ 'go', 'build' ] )
-  os.chdir( p.join( DIR_OF_THIS_SCRIPT, 'third_party', 'godef' ) )
-  CheckCall( [ 'go', 'build', 'godef.go' ] )
-
 def BuildSwiftySwiftVim():
   os.chdir( p.join( DIR_OF_THIS_SCRIPT, 'third_party', 'swiftyswiftvim' ) )
   CheckCall( [ 'bash', 'bootstrap' ] )
-
-def BuildRacerd():
-  """
-  Build racerd. This requires a reasonably new version of rustc/cargo.
-  """
-  if not FindExecutable( 'cargo' ):
-    sys.exit( 'ERROR: cargo is required for the Rust completer.' )
-
-  os.chdir( p.join( DIR_OF_THIRD_PARTY, 'racerd' ) )
-  args = [ 'cargo', 'build' ]
-  # We don't use the --release flag on Travis/AppVeyor because it makes building
-  # racerd 2.5x slower and we don't care about the speed of the produced racerd.
-  if not OnTravisOrAppVeyor():
-    args.append( '--release' )
-  CheckCall( args )
-
-
-def SetUpTern():
-  # On Debian-based distributions, node is by default installed as nodejs.
-  node = PathToFirstExistingExecutable( [ 'nodejs', 'node' ] )
-  if not node:
-    sys.exit( 'ERROR: node is required to set up Tern.' )
-  npm = FindExecutable( 'npm' )
-  if not npm:
-    sys.exit( 'ERROR: npm is required to set up Tern.' )
-
-  # We install Tern into a runtime directory. This allows us to control
-  # precisely the version (and/or git commit) that is used by ycmd.  We use a
-  # separate runtime directory rather than a submodule checkout directory
-  # because we want to allow users to install third party plugins to
-  # node_modules of the Tern runtime.  We also want to be able to install our
-  # own plugins to improve the user experience for all users.
-  #
-  # This is not possible if we use a git submodule for Tern and simply run 'npm
-  # install' within the submodule source directory, as subsequent 'npm install
-  # tern-my-plugin' will (heinously) install another (arbitrary) version of Tern
-  # within the Tern source tree (e.g. third_party/tern/node_modules/tern. The
-  # reason for this is that the plugin that gets installed has "tern" as a
-  # dependency, and npm isn't smart enough to know that you're installing
-  # *within* the Tern distribution. Or it isn't intended to work that way.
-  #
-  # So instead, we have a package.json within our "Tern runtime" directory
-  # (third_party/tern_runtime) that defines the packages that we require,
-  # including Tern and any plugins which we require as standard.
-  os.chdir( p.join( DIR_OF_THIS_SCRIPT, 'third_party', 'tern_runtime' ) )
-  CheckCall( [ npm, 'install', '--production' ] )
 
 
 def WritePythonUsedDuringBuild():
@@ -496,16 +387,7 @@ def Main():
   args = ParseArguments()
   ExitIfYcmdLibInUseOnWindows()
   BuildYcmdLib( args )
-  if args.omnisharp_completer or args.all_completers:
-    BuildOmniSharp()
-  if args.gocode_completer or args.all_completers:
-    BuildGoCode()
-  if args.tern_completer or args.all_completers:
-    SetUpTern()
-  if args.racer_completer or args.all_completers:
-    BuildRacerd()
-  if args.swift_completer or args.all_completers:
-    BuildSwiftySwiftVim()
+  BuildSwiftySwiftVim()
   WritePythonUsedDuringBuild()
 
 
