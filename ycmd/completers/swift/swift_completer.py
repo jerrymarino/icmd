@@ -334,7 +334,7 @@ class SwiftCompletion():
     self.module_path = ''
     # TODO: Give the user the option to use for placeholders for quick typing:
     # insertion_text is conditionally ( key.sourcetext ).
-    self.name = json_value.get( 'key.name' )
+    self.name = json_value.get( 'key.sourcetext' )
     self.description = json_value.get( 'key.description' )
     self.type = 'swift'
 
