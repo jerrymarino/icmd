@@ -387,7 +387,8 @@ def Main():
   args = ParseArguments()
   ExitIfYcmdLibInUseOnWindows()
   BuildYcmdLib( args )
-  BuildSwiftySwiftVim()
+  if OnMac():
+    BuildSwiftySwiftVim()
   WritePythonUsedDuringBuild()
 
 

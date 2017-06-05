@@ -119,12 +119,6 @@ def FixupCompleters( parsed_args ):
            'Please use "--no-completer cfamily" instead.' )
     completers.remove( 'cfamily' )
 
-  if 'USE_CLANG_COMPLETER' in os.environ:
-    if os.environ[ 'USE_CLANG_COMPLETER' ] == 'false':
-      completers.remove( 'cfamily' )
-    else:
-      completers.add( 'cfamily' )
-
   # Currently, swift is tested on OSX with the Xcode SourceKit
   if not OnMac():
     completers.remove( 'swift' )
