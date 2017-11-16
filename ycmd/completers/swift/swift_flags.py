@@ -151,6 +151,8 @@ BASIC_FLAG_BLACKLIST = set( [
                               '-MD',
                               '-MMD',
                               '--fcolor-diagnostics',
+                              # TODO: Consider checking if paths should part of paired
+                              # list.
                               '-emit-reference-dependencies-path',
                               '-emit-dependencies-path',
                               '-emit-module-path',
@@ -165,7 +167,7 @@ BASIC_FLAG_BLACKLIST = set( [
 #
 # Unconditionally exclude flags in this blacklist and the next value
 
-PAIRED_FLAG_BLACKLIST = set( [ '-Xcc' ] )
+PAIRED_FLAG_BLACKLIST = set( [ '-Xcc',  '-pch-output-dir' ] )
 
 FLAG_START_TOKEN = '-'
 
